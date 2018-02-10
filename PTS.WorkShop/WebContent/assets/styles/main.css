@@ -1,0 +1,29 @@
+body {
+	
+}
+
+.sapMIBar.sapMHeader-CTX {
+	color: #666666;
+	background-color: #ffffff;
+	filter:none;
+	background-image:none;
+	height: 60px;
+	padding-top:10px;
+	
+}
+
+.appTitle {
+	font-size: 25px;
+}
+
+.flexDateTime {
+	font-size:12px;
+}
+
+.InfoStateRed .sapMSLITitleOnly {
+	color: #cc0000!important;
+}
+
+.InfoStateGreen .sapMSLITitleOnly {
+	color: #008000!important;
+}

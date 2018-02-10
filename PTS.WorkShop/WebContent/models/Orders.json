@@ -1,0 +1,44 @@
+{
+  "Orders": [
+	{
+	  "ordernr": "4001",
+	  "ordertype": "FP",
+	  "description": "Fixed price repair",
+	  "customerName": "Fun Inc.",
+	  "orderDate": "2015-04-01T00:00:00",
+	  "Status": "REL"
+	},
+	{
+	  "ordernr": "4002",
+	  "ordertype": "FP",
+	  "description": "Fixed price repair",
+	  "customerName": "Fun Inc.",
+	  "orderDate": "2016-04-01T00:00:00",
+	  "Status": "CRTD"
+	},
+	{
+	  "ordernr": "4003",
+	  "ordertype": "CH",
+	  "description": "Repair",
+	  "customerName": "Fun Inc.",
+	  "orderDate": "2017-04-01T00:00:00",
+	  "Status": "REL"
+	},
+	{
+	  "ordernr": "4004",
+	  "ordertype": "PG",
+	  "description": "Warranty",
+	  "customerName": "Fun Inc.",
+	  "orderDate": "2015-04-01T00:00:00",
+	  "Status": "REL"
+	},
+	{
+	  "ordernr": "4005",
+	  "ordertype": "FP",
+	  "description": "Fixed price repair",
+	  "customerName": "Fun Inc.",
+	  "orderDate": "2015-04-01T00:00:00",
+	  "Status": "REL"
+	}
+  ]
+}

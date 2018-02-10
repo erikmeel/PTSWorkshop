@@ -1,0 +1,57 @@
+{
+  "_version": "1.1.0",
+  "sap.app": {
+	"_version": "1.1.0",
+	"id": "PTS_Workshop",
+	"type": "application",
+	"i18n": "i18n/i18n.properties",
+	"title": "{{appTitle}}",
+	"description": "{{appDescription}}",
+	"applicationVersion": {
+	  "version": "1.0.0"
+	},
+	"dataSources": {
+	  "orders_source": {
+	  	"uri": "models/Orders.json",
+	  	"type": "JSON"
+	  }
+	}
+  },
+  "sap.ui": {
+	"_version": "1.1.0",
+	"technology": "UI5",
+	"deviceTypes": {
+	  "desktop": true,
+	  "tablet": true,
+	  "phone": false
+	},
+	"supportedThemes": [
+		"sap_hcb",
+		"sap_belize"
+	]
+  },
+  "sap.ui5": {
+	"_version": "1.1.0",
+	"rootView": "view.App",
+	"dependencies": {
+	  "minUI5Version": "1.30",
+	  "libs": {
+		"sap.m": {}
+	  }
+	},
+
+	"models": {
+	  "i18n": {
+		"type": "sap.ui.model.resource.ResourceModel",
+		"settings": {
+		  "bundleName": "i18n.i18n",
+		  "bundleLocale": "en-EN"
+		}
+	  },
+	  "orders": {
+	  	"type": "sap.ui.model.json.JSONModel",
+	  	"dataSource": "orders_source"
+	  }
+	}
+  }
+}
