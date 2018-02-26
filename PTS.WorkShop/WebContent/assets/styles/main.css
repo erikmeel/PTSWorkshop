@@ -3,8 +3,8 @@ body {
 }
 
 .sapMIBar.sapMHeader-CTX {
-	color: #666666;
-	background-color: #ffffff;
+	color: #ffffff;
+	background-color: #0099cc;
 	filter:none;
 	background-image:none;
 	height: 60px;
@@ -14,10 +14,13 @@ body {
 
 .appTitle {
 	font-size: 25px;
+	color: #ffffff!important;
 }
 
 .flexDateTime {
-	font-size:12px;
+	font-size:14px;
+	text-align:center!important;
+	color: #ffffff!important;
 }
 
 .InfoStateRed .sapMSLITitleOnly {

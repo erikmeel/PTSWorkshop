@@ -67,7 +67,8 @@ sap.ui.controller("views.App", {
     	var eqList = this.byId("idFlexEquipment");
     	var eqState = this.byId("idCurrentState");
     	var ser = this.byId("idSerialNr");
-    	var flow = this.byId("idServiceFlow");
+    	var flowIconTabItem = this.byId("idServiceFlow");
+    	var subIconBar = this.byId("idSubIconBar");
     	
     	curr.setVisible(true);
     	cmb.setVisible(false);
@@ -132,8 +133,8 @@ sap.ui.controller("views.App", {
 							}
 							
 							oModel.setProperty("/equipmentfound", true);
-							flow.setVisible(true);
-							flow.focus();
+							flowIconTabItem.setVisible(true);
+							subIconBar.setSelectedKey(flowIconTabItem.sId);
 							curr.setEnabled(false);
 							mainPage.setShowFooter(true);
 						} 
@@ -141,14 +142,14 @@ sap.ui.controller("views.App", {
 					//If no data is found, reset content of other fields, areas...	
 					} else {
 						curr.setEnabled(true);
-						flow.setVisible(false);
+						flowIconTabItem.setVisible(false);
 						mainPage.setShowFooter(false);
 					} 
 				},  
 				error: function(json) {  alert("fail to post"); } });
 		} else {
 			curr.setEnabled(true);
-			flow.setVisible(false);
+			flowIconTabItem.setVisible(false);
 			mainPage.setShowFooter(false);
 		} 
 	},
@@ -285,7 +286,7 @@ sap.ui.controller("views.App", {
 				} 
 			}, */
 			success: this.onRequestUserInfoSuccess,
-			error: function(json) {  alert("fail to post"); } });
+			error: function(json) {   } });
     },
     
     onRequestUserInfoSuccess: function(data) {
@@ -319,7 +320,7 @@ sap.ui.controller("views.App", {
     		for(var i = 0; i < aData.length; i++) {
     			var listItem = new sap.ui.core.ListItem();
     			listItem.setText(aData[i].name+" ("+aData[i].city+")");
-    			listItem.setTooltip(aData[i].street + ", "+aData[i].house_number+", "+aData[i].city);
+    			listItem.setTooltip(aData[i].street + ", "+aData[i].house_number+", "+aData[i].city+" (SAP id: "+aData[i].id+")");
     			listItem.setKey(aData[i].id);
     			cmb.addItem(listItem);
     			
@@ -338,7 +339,7 @@ sap.ui.controller("views.App", {
     		eqList.setVisible(true);
     	} else if(aData && aData.length == 1) {
     		curr.setVisible(true);
-    		cmd.setVisible(false);
+    		cmb.setVisible(false);
     	}    		
     },
 
@@ -396,6 +397,7 @@ sap.ui.controller("views.App", {
     	if(!eqState || eqState=="" || eqState=="Unknown" || eqState=="Checked-Out") {
     		oModel.setProperty("/equipment/checked_in","Checked-In");
     		if(cmbFlow.getValue()=="") {
+    			cmbFlow.setValueState("Error");
     			btnCheckin.setEnabled(false);
     		}
     		oModel.setProperty("/checkinButton", "Start Service Repair");
@@ -420,9 +422,12 @@ sap.ui.controller("views.App", {
     	var inPrice = this.byId("idFixedPriceValue");
     	var eqState = oModel.getProperty("/equipment/checked_in");
     	
-    	if(cmbFlow.getValue()==""&&eqState=="Checked-In")
+    	if(cmbFlow.getValue()==""&&eqState=="Checked-In") {
+    		cmbFlow.setValueState("Warning");
     		btnCheckin.setEnabled(false);
+    	}
     	else {
+    		cmbFlow.setValueState("None");
     		if(cmbFlow.getSelectedKey()=="FP") {
     			inPrice.setVisible(true);
     			if(this.isNumeric(inPrice.mProperties.value)&&inPrice.mProperties.value > 0)
@@ -435,5 +440,25 @@ sap.ui.controller("views.App", {
     			btnCheckin.setEnabled(true);
     		}
     	}
-    }
+    },
+    
+    inputFPPriceChange: function(t) {
+		var btn = this.byId("idBtnCheckin");
+		var inp = this.byId("idFixedPriceValue");
+		var value = t.mParameters.value;
+		var eqState = oModel.getProperty("/equipment/checked_in");
+		
+		if(eqState && eqState == "Checked-In") {
+			if(this.isNumeric(value) && value > 0) {
+				inp.setValueState("None");
+				btn.setEnabled(true);
+			}
+			else {
+				inp.setValueState("Error");
+				btn.setEnabled(false);
+				
+			}
+		}
+		
+	}
 });

@@ -9,17 +9,17 @@
 		<customHeader>
 			<Bar>
 				<contentLeft>
-					<Image src="assets/images/logo.jpg" height="45px" />
+					<Image src="assets/images/logo_inverted.png" height="45px" />
 				</contentLeft>
 				<contentMiddle>
 					<Label text="{i18n>MainHeaderPanelText}" class="sapUiResponsiveMargin appTitle"
 						width="auto" />
 				</contentMiddle>
 				<contentRight>
-					<FlexBox class="flexDateTime" alignContent="Center"
+					<FlexBox alignContent="Center"
 					justifyContent="Center" wrap="Wrap"
-						renderType="Bare" height="70px" width="100px">
-						<Text id="idDateTime" />
+						renderType="Bare" height="60px" width="100px">
+						<Text class="flexDateTime" id="idDateTime" />
 					</FlexBox>
 				</contentRight>
 			</Bar>
@@ -84,7 +84,7 @@
 					</IconTabFilter>
 				</items>
 			</IconTabBar>
-			<IconTabBar id="idTabBar2">
+			<IconTabBar id="idSubIconBar">
 				<items>
 					<IconTabFilter id="idServiceFlow" text="Service Flow" visible="false">
 						<l:Grid defaultSpan="L6 M6 S12">
@@ -112,7 +112,7 @@
 												<l:GridData span="L5 M5 S8"/>
 											</layoutData>
 										</ComboBox>
-										<Input id="idFixedPriceValue" placeholder="Price" tooltip="Enter price for order" visible="false">
+										<Input id="idFixedPriceValue" placeholder="Price" tooltip="Enter price for order" visible="false" liveChange="inputFPPriceChange">
 											<layoutData>
 												<l:GridData span="L2 M2 S2"/>
 											</layoutData>
@@ -191,6 +191,13 @@
 				<contentMiddle>
 					<Label text="{/equipment/description}"/>
 				</contentMiddle>
+				<contentRight>
+					<Label text="{i18n>CustomerName}" class="sapUiSmallMargin"/>
+					<Label text="{/equipment/installed_at_name}"/>
+					<Label text="(SAP id: "/>
+					<Label text="{/equipment/installed_at}"/>
+					<Label text=")"/>
+				</contentRight>
 			</Bar>
 		</footer>
 	</Page>
