@@ -30,3 +30,8 @@ body {
 .InfoStateGreen .sapMSLITitleOnly {
 	color: #008000!important;
 }
+
+.sapUiGlobalBackgroundColor, .sapMGlobalBackgroundColor {
+	color: #ffffff;
+	background-image: linear-gradient(to bottom,#c9c9c9 0,#dcecf0 50%,#dde4eb 100%);
+}

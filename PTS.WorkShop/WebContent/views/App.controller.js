@@ -21,7 +21,12 @@ sap.ui.controller("views.App", {
         
         var cmbCustomers = this.getView().byId("idCustomerCombo");
         var bnd = cmbCustomers.getBinding("items");
-
+        
+        //Set Initial focus
+        var oSNInput = this.getView().byId("idSerialNr");
+        this.setInitialFocus(oSNInput);
+        
+        //Initialize data model
         oModel.setProperty("/equipmentfound", false);
 		oModel.setProperty("/equipment/checked_in",false);
 		
@@ -59,6 +64,16 @@ sap.ui.controller("views.App", {
 //	onExit: function() {
 //
 //	}
+	
+	setInitialFocus: function(control) { 
+		  this.getView().addEventDelegate({
+		    onAfterShow: function() {
+		      setTimeout(function() {
+		        control.focus();
+		      }.bind(this), 0);
+		    },
+		  }, this);
+	},
 	
 	serialChange: function(t) {
 		var curr = this.byId("idCustomerInput");
@@ -100,11 +115,19 @@ sap.ui.controller("views.App", {
 			    'serial_number': sernr
 			  }
 		
+		var locationHostName = window.location.hostname;
+		var strUrl;
+		if(locationHostName.toLowerCase()=="localhost") {
+			strUrl = "proxy/http/as1sapr3.emea.group.atlascopco.com:8060/sap/zrest/stc/equipment?sap-client=500&sap-language=EN";
+		} else {
+			strUrl = "/sap/zrest/stc/equipment?sap-client=500&sap-language=EN";
+		}
+		
 		if(sernr.length > 8) {
 			var aData = jQuery.ajax({
 				type: "GET",
 			    contentType: "application/json", 
-			    url: "proxy/http/aq1sapr3.emea.group.atlascopco.com:8075/sap/zrest/stc/equipment?sap-client=500&sap-language=EN",
+			    url: strUrl,
 				data: {"json": JSON.stringify(j), "action": "get_by_serial"},
 			    dataType: "json", 
 			    success: function(data, textStatus, jqXHR){ 
@@ -194,10 +217,18 @@ sap.ui.controller("views.App", {
 						'account_grps':  aAccountGrps
 				}
 				
+				var locationHostName = window.location.hostname;
+				var strUrl;
+				if(locationHostName.toLowerCase()=="localhost") {
+					strUrl = "proxy/http/as1sapr3.emea.group.atlascopco.com:8060/sap/zrest/stc/customer?sap-client=500&sap-language=EN";
+				} else {
+					strUrl = "/sap/zrest/stc/customer?sap-client=500&sap-language=EN";
+				}
+				
 				var aData = jQuery.ajax({
 					type: "GET",
 				    contentType: "application/json", 
-				    url: "proxy/http/aq1sapr3.emea.group.atlascopco.com:8075/sap/zrest/stc/customer?sap-client=500&sap-language=EN",
+				    url: strUrl,
 					data: {"json": JSON.stringify(j), "action": "get_by_address"},
 				    dataType: "json", 
 				    success: function(data, textStatus, jqXHR){ 
@@ -222,6 +253,7 @@ sap.ui.controller("views.App", {
 	customerDropDownChange: function(t) {
 		var curr = this.byId("idCustomerInput");
 		var cmb = this.byId("idCustomerCombo");
+		var iconBar = this.byId("idSubIconBar");
 		var equipmentFound = 0;
 		
 		if(cmb.getValue()=="") {
@@ -230,6 +262,7 @@ sap.ui.controller("views.App", {
 			oModel.setProperty("/customers",aCustomers);
 			curr.setVisible(true);
 			cmb.setVisible(false);
+			iconBar.setVisible(false);
 		} else {
 			
 			this.getEquipmentFromCustomer(cmb.getSelectedKey());
@@ -268,23 +301,20 @@ sap.ui.controller("views.App", {
       },
 
     readUserInfo: function() {
+    	
+    	var locationHostName = window.location.hostname;
+		var strUrl;
+		if(locationHostName.toLowerCase()=="localhost") {
+			strUrl = "proxy/http/as1sapr3.emea.group.atlascopco.com:8060/sap/zrest/stc/user?sap-client=500&sap-language=EN";
+		} else {
+			strUrl = "/sap/zrest/stc/user?sap-client=500&sap-language=EN";
+		}
+    	
     	var aData = jQuery.ajax({
 			type: "GET",
 		    contentType: "application/json", 
-		    url: "proxy/http/aq1sapr3.emea.group.atlascopco.com:8075/sap/zrest/stc/user?sap-client=500&sap-language=EN",
+		    url: strUrl,
 		    dataType: "json", 
-		/*    success: function(data, textStatus, jqXHR){ 
-			
-				var result = data[0].model;
-				if (result.length > 0) {
-					//alert("data found");
-					if(result.length === 1) {
-						var aUser = [];
-						aUser.push(result[0]);
-						oModel.setProperty("/userinfo", aUser);
-					} 
-				} 
-			}, */
 			success: this.onRequestUserInfoSuccess,
 			error: function(json) {   } });
     },
@@ -306,6 +336,7 @@ sap.ui.controller("views.App", {
     	var curr = this.byId("idCustomerInput");
     	var cmb = this.byId("idCustomerCombo");
     	var eqList = this.byId("idFlexEquipment");
+    	var iconBar = this.byId("idSubIconBar");
     	
     	if(aData && aData.length > 1) {
     		curr.setVisible(false);
@@ -314,6 +345,8 @@ sap.ui.controller("views.App", {
     		cmb.setEditable(true);
     		cmb.removeAllItems();
     		var comboValue = null;
+    		
+    		iconBar.setVisible(true);
     		
     		aData.sort(function( a, b) { return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);});
     		
@@ -338,9 +371,12 @@ sap.ui.controller("views.App", {
     		cmb.setVisible(true);
     		eqList.setVisible(true);
     	} else if(aData && aData.length == 1) {
-    		curr.setVisible(true);
-    		cmb.setVisible(false);
-    	}    		
+    			curr.setVisible(true);
+    			cmb.setVisible(false);
+    			iconBar.setVisible(true);
+    		}  else {
+    			iconBar.setVisible(false);
+    		}  		
     },
 
     getEquipmentFromCustomer: function(id) {
@@ -352,11 +388,19 @@ sap.ui.controller("views.App", {
 				'ids': aIds,
 				'READ_EQUIPMENTS': "TRUE"
 		}
+    	
+    	var locationHostName = window.location.hostname;
+		var strUrl;
+		if(locationHostName.toLowerCase()=="localhost") {
+			strUrl = "proxy/http/as1sapr3.emea.group.atlascopco.com:8060/sap/zrest/stc/customer?sap-client=500&sap-language=EN";
+		} else {
+			strUrl = "/sap/zrest/stc/customer?sap-client=500&sap-language=EN";
+		}
 		
 		var aData = jQuery.ajax({
 			type: "GET",
 		    contentType: "application/json", 
-		    url: "proxy/http/aq1sapr3.emea.group.atlascopco.com:8075/sap/zrest/stc/customer?sap-client=500&sap-language=EN",
+		    url: strUrl,
 			data: {"json": JSON.stringify(j), "action": "get_all_in_range"},
 		    dataType: "json", 
 		    success: function(data, textStatus, jqXHR){ 

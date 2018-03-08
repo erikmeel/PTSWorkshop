@@ -28,7 +28,7 @@
 			<IconTabBar>
 				<items>
 					<IconTabFilter id="idSearchForm" text="{i18n>EquipmentSearchIconBarText}">
-						<l:Grid hSpacing="1" class="sapUiSmallMarginTop" defaultSpan="L6 M6 S10">
+						<l:Grid hSpacing="1" class="sapUiSmallMarginTop">
 							<l:content>
 								<StandardListItem title="{i18n>SerialNumber}">
 									<layoutData>
@@ -84,7 +84,7 @@
 					</IconTabFilter>
 				</items>
 			</IconTabBar>
-			<IconTabBar id="idSubIconBar">
+			<IconTabBar id="idSubIconBar" visible="false">
 				<items>
 					<IconTabFilter id="idServiceFlow" text="Service Flow" visible="false">
 						<l:Grid defaultSpan="L6 M6 S12">
