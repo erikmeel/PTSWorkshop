@@ -90,7 +90,7 @@
 						<l:Grid defaultSpan="L6 M6 S12">
 							<l:content>
 								<TextArea id="idNotifText" rows="10" width="100%" 
-									value="Damage:&#13;&#13;Driver:&#13;License Plate:">
+									value="Damage:&#13;&#13;Driver:&#13;License Plate:&#13;LOT:">
 									<layoutData>
 										<l:GridData span="L5 M5 S10"/>
 									</layoutData>
