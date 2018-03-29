@@ -84,9 +84,9 @@
 					</IconTabFilter>
 				</items>
 			</IconTabBar>
-			<IconTabBar id="idSubIconBar" visible="false">
+			<IconTabBar id="idSubIconBar" visible="{/equipmentfound}" select="onSubIconBarSelect">
 				<items>
-					<IconTabFilter id="idServiceFlow" text="Service Flow" visible="false">
+					<IconTabFilter id="idServiceFlow" text="Service Flow" visible="{/equipmentfound}">
 						<l:Grid defaultSpan="L6 M6 S12">
 							<l:content>
 								<TextArea id="idNotifText" rows="10" width="100%" 
@@ -97,31 +97,21 @@
 								</TextArea>
 								<l:Grid defaultSpan="L7 M7 S6">
 									<l:content>
-										<Label text="Service Flow" labelFor="idCmbFlow">
-											<layoutData>
-												<l:GridData span="L2 M2 S10"/>
-											</layoutData>
-										</Label>
-										<ComboBox id="idCmbFlow" toolTip="Select service flow..."  
-											visible="true" selectionChange="flowDropDownChange" width="300px">
-											<items>
-												<c:ListItem text="Fixed Price (FP)" tooltip="Execute a fixed price Service Flow" key="FP"/>
-												<c:ListItem text="Do and Charge (CH)" tooltip="Execute an RRB Service Flow" key="CH"/>
-											</items>
-											<layoutData>
-												<l:GridData span="L5 M5 S8"/>
-											</layoutData>
-										</ComboBox>
-										<Input id="idFixedPriceValue" placeholder="Price" tooltip="Enter price for order" visible="false" liveChange="inputFPPriceChange">
-											<layoutData>
-												<l:GridData span="L2 M2 S2"/>
-											</layoutData>
-										</Input>
 										<Button id="idBtnCheckin" type="Emphasized" text="{/checkinButton}" press="checkInEquipment" >
 											<layoutData>
-												<l:GridData span="L8 M8 S8"/>
+												<l:GridData span="L3 M3 S8"/>
 											</layoutData>
 										</Button>
+										<Label text="Fixed Price:" labelFor="idCmbFlow">
+											<layoutData>
+												<l:GridData span="L3 M3 S10"/>
+											</layoutData>
+										</Label>
+										<Input id="idFixedPriceValue" placeholder="Price" tooltip="Enter price for order" description="LCU" enabled="false" liveChange="inputFPPriceChange">
+											<layoutData>
+												<l:GridData span="L4 M4 S4"/>
+											</layoutData>
+										</Input>
 									</l:content>
 								</l:Grid>
 							</l:content>

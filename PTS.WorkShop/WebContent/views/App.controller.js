@@ -19,9 +19,6 @@ sap.ui.controller("views.App", {
         
         this.readUserInfo();
         
-        var cmbCustomers = this.getView().byId("idCustomerCombo");
-        var bnd = cmbCustomers.getBinding("items");
-        
         //Set Initial focus
         var oSNInput = this.getView().byId("idSerialNr");
         this.setInitialFocus(oSNInput);
@@ -53,7 +50,6 @@ sap.ui.controller("views.App", {
 		var mainPage = this.byId("mainPage");
 
         mainPage.setShowFooter(false);
-
 		
 	},
 
@@ -76,8 +72,8 @@ sap.ui.controller("views.App", {
 	},
 	
 	serialChange: function(t) {
-		var curr = this.byId("idCustomerInput");
-    	var cmb = this.byId("idCustomerCombo");
+		var custumerInput = this.byId("idCustomerInput");
+    	var customerCombo = this.byId("idCustomerCombo");
     	var mainPage = this.byId("mainPage");
     	var eqList = this.byId("idFlexEquipment");
     	var eqState = this.byId("idCurrentState");
@@ -85,11 +81,11 @@ sap.ui.controller("views.App", {
     	var flowIconTabItem = this.byId("idServiceFlow");
     	var subIconBar = this.byId("idSubIconBar");
     	
-    	curr.setVisible(true);
-    	cmb.setVisible(false);
+    	custumerInput.setVisible(true);
+    	customerCombo.setVisible(false);
     	
     	//Clear list of found customers in model as we search now on serial
-    	cmb.removeAllItems();
+    	customerCombo.removeAllItems();
     	var aCustomers = [];
     	oModel.setProperty("/customers", aCustomers);
     	
@@ -156,25 +152,26 @@ sap.ui.controller("views.App", {
 							}
 							
 							oModel.setProperty("/equipmentfound", true);
-							flowIconTabItem.setVisible(true);
 							subIconBar.setSelectedKey(flowIconTabItem.sId);
-							curr.setEnabled(false);
+							custumerInput.setEnabled(false);
 							mainPage.setShowFooter(true);
 						} 
 					
 					//If no data is found, reset content of other fields, areas...	
 					} else {
-						curr.setEnabled(true);
-						flowIconTabItem.setVisible(false);
+						oModel.setProperty("/equipmentfound", false);
+						custumerInput.setEnabled(true);
+						//flowIconTabItem.setVisible(false);
 						mainPage.setShowFooter(false);
 					} 
 				},  
 				error: function(json) {  alert("fail to post"); } });
 		} else {
-			curr.setEnabled(true);
-			flowIconTabItem.setVisible(false);
+			custumerInput.setEnabled(true);
+			oModel.setProperty("/equipmentfound", false);
+			//flowIconTabItem.setVisible(false);
 			mainPage.setShowFooter(false);
-		} 
+		}
 	},
 	
 	customerInputChange: function(t) {
@@ -189,6 +186,8 @@ sap.ui.controller("views.App", {
 		
 		var aEquipment = oModel.getProperty("/equipment");
 		aEquipment = [];
+		
+		oModel.setProperty("/equipmentfound", false);
 		
 		//custn = custn.toUpperCase();
 		var equipment = {
@@ -251,21 +250,21 @@ sap.ui.controller("views.App", {
 	},
 	
 	customerDropDownChange: function(t) {
-		var curr = this.byId("idCustomerInput");
-		var cmb = this.byId("idCustomerCombo");
+		var customerInput = this.byId("idCustomerInput");
+		var customerCombo = this.byId("idCustomerCombo");
 		var iconBar = this.byId("idSubIconBar");
 		var equipmentFound = 0;
 		
-		if(cmb.getValue()=="") {
-			curr.mProperties.value = "";
+		if(customerCombo.getValue()=="") {
+			customerInput.mProperties.value = "";
 			aCustomers = [];
 			oModel.setProperty("/customers",aCustomers);
-			curr.setVisible(true);
-			cmb.setVisible(false);
+			customerInput.setVisible(true);
+			customerCombo.setVisible(false);
 			iconBar.setVisible(false);
 		} else {
 			
-			this.getEquipmentFromCustomer(cmb.getSelectedKey());
+			this.getEquipmentFromCustomer(customerCombo.getSelectedKey());
 			
 			var eqModel = this.getView().getModel("dataModel");
 			if(eqModel) {
@@ -333,17 +332,18 @@ sap.ui.controller("views.App", {
     
     fillCustomerCombo: function() {
     	var aData = oModel.getProperty("/customers");
-    	var curr = this.byId("idCustomerInput");
-    	var cmb = this.byId("idCustomerCombo");
+    	var customerInput = this.byId("idCustomerInput");
+    	var customerCombo = this.byId("idCustomerCombo");
     	var eqList = this.byId("idFlexEquipment");
+    	var equipListIconTabItem = this.byId("idEquipmentList");
     	var iconBar = this.byId("idSubIconBar");
     	
     	if(aData && aData.length > 1) {
-    		curr.setVisible(false);
-    		cmb.setShowSecondaryValues(true);
-    		cmb.setTooltip("Select customer...");
-    		cmb.setEditable(true);
-    		cmb.removeAllItems();
+    		customerInput.setVisible(false);
+    		customerCombo.setShowSecondaryValues(true);
+    		customerCombo.setTooltip("Select customer...");
+    		customerCombo.setEditable(true);
+    		customerCombo.removeAllItems();
     		var comboValue = null;
     		
     		iconBar.setVisible(true);
@@ -355,24 +355,25 @@ sap.ui.controller("views.App", {
     			listItem.setText(aData[i].name+" ("+aData[i].city+")");
     			listItem.setTooltip(aData[i].street + ", "+aData[i].house_number+", "+aData[i].city+" (SAP id: "+aData[i].id+")");
     			listItem.setKey(aData[i].id);
-    			cmb.addItem(listItem);
+    			customerCombo.addItem(listItem);
     			
-    			var custValue = curr.mProperties.value
+    			var custValue = customerInput.mProperties.value
     			if(aData[i].name.substring(0, custValue.length).toUpperCase() == custValue.toUpperCase() && comboValue == null) {
     				comboValue = aData[i].name;
-    				cmb.setValue(comboValue);
-    				cmb.setSelectedItem(listItem);
-    				this.getEquipmentFromCustomer(cmb.getSelectedKey());
+    				customerCombo.setValue(comboValue);
+    				customerCombo.setSelectedItem(listItem);
+    				this.getEquipmentFromCustomer(customerCombo.getSelectedKey());
     			}
     		}
-    		if(cmb.getValue()=="")
-    			cmb.setValue(aData[0].name);
+    		if(customerCombo.getValue()=="")
+    			customerCombo.setValue(aData[0].name);
     		
-    		cmb.setVisible(true);
+    		iconBar.setSelectedKey(equipListIconTabItem.sId);
+    		customerCombo.setVisible(true);
     		eqList.setVisible(true);
     	} else if(aData && aData.length == 1) {
-    			curr.setVisible(true);
-    			cmb.setVisible(false);
+    			customerInput.setVisible(true);
+    			customerCombo.setVisible(false);
     			iconBar.setVisible(true);
     		}  else {
     			iconBar.setVisible(false);
@@ -381,6 +382,19 @@ sap.ui.controller("views.App", {
 
     getEquipmentFromCustomer: function(id) {
     	var aIds = [];
+    	var subIconBar = this.byId("idSubIconBar");
+    	var equipListIconTabItem = this.byId("idEquipmentList");
+    	var flowIconTabItem = this.byId("idServiceFlow");
+    	var eqFlexList = this.byId("idFlexEquipment");
+    	
+    	var eqFound = oModel.getProperty("/equipmentfound");
+    	var eqList = oModel.getProperty("/equipmentList");
+    	
+    	if(eqFound == true && eqList != null && eqList.length > 0) {
+    		subIconBar.setSelectedKey(flowIconTabItem.sId);
+    	} else {
+    		subIconBar.setSelectedKey(equipListIconTabItem.sId);
+    	}
     	
     	aIds.push(id);
     	
@@ -408,8 +422,10 @@ sap.ui.controller("views.App", {
 				var result = data[0].model;
 				if (result.length > 0) {
 					oModel.setProperty("/equipmentList", result[0].equipments);
+					eqFlexList.setVisible(true);
 				} else {
 					oModel.setProperty("/equipmentList", null);
+					eqFlexList.setVisible(false);
 				};
 			},  
 			error: function(json) {  alert("fail to post"); } });
@@ -434,15 +450,23 @@ sap.ui.controller("views.App", {
     },
     
     checkInEquipment: function() {
-    	var cmbFlow = this.byId("idCmbFlow");
+    	var inpFPPrice = this.byId("idFixedPriceValue");
     	var btnCheckin = this.byId("idBtnCheckin");
+    	
+    	inpFPPrice.setEnabled(false);
+    	var value = 0;
+    	if(inpFPPrice.mProperties.value) 
+    		value = inpFPPrice.mProperties.value;
     	
     	var eqState = oModel.getProperty("/equipment/checked_in");
     	if(!eqState || eqState=="" || eqState=="Unknown" || eqState=="Checked-Out") {
     		oModel.setProperty("/equipment/checked_in","Checked-In");
-    		if(cmbFlow.getValue()=="") {
-    			cmbFlow.setValueState("Error");
+    		inpFPPrice.setEnabled(true);
+    		if(value <= 0) {
+    			inpFPPrice.setValueState("Error");
     			btnCheckin.setEnabled(false);
+    		} else {
+    			btnCheckin.setEnabled(true);
     		}
     		oModel.setProperty("/checkinButton", "Start Service Repair");
     	}
@@ -459,33 +483,7 @@ sap.ui.controller("views.App", {
     		oModel.setProperty("/checkinButton", "Check in");
     	}
     },
-    
-    flowDropDownChange: function() {
-    	var cmbFlow = this.byId("idCmbFlow");
-    	var btnCheckin = this.byId("idBtnCheckin");
-    	var inPrice = this.byId("idFixedPriceValue");
-    	var eqState = oModel.getProperty("/equipment/checked_in");
-    	
-    	if(cmbFlow.getValue()==""&&eqState=="Checked-In") {
-    		cmbFlow.setValueState("Warning");
-    		btnCheckin.setEnabled(false);
-    	}
-    	else {
-    		cmbFlow.setValueState("None");
-    		if(cmbFlow.getSelectedKey()=="FP") {
-    			inPrice.setVisible(true);
-    			if(this.isNumeric(inPrice.mProperties.value)&&inPrice.mProperties.value > 0)
-    				btnCheckin.setEnabled(true);
-    			else
-    				btnCheckin.setEnabled(false);
-    		}
-    		else {
-    			inPrice.setVisible(false);
-    			btnCheckin.setEnabled(true);
-    		}
-    	}
-    },
-    
+      
     inputFPPriceChange: function(t) {
 		var btn = this.byId("idBtnCheckin");
 		var inp = this.byId("idFixedPriceValue");
@@ -504,5 +502,18 @@ sap.ui.controller("views.App", {
 			}
 		}
 		
+	},
+	
+	onSubIconBarSelect: function(t) {
+		var equipFound = oModel.getProperty("/equipmentfound");
+		var equipListIconTabItem = this.byId("idEquipmentList");
+		
+		if(equipFound == true && t.mParameters.selectedKey == equipListIconTabItem.sId) {
+			var equipList = oModel.getProperty("/equipmentList")
+			if(equipList == null || equipList.length == 0) {
+				var equip = oModel.getProperty("/equipment");
+				this.getEquipmentFromCustomer(equip.installed_at);
+			}
+		}
 	}
 });
