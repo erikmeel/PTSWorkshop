@@ -3,12 +3,16 @@
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
+		<meta http-equiv='cache-control' content='no-cache, no-store, must-revalidate'>
+		<meta http-equiv='Expires' content='-1'>
+		<meta http-equiv='Pragma' content='no-cache'>
 
 		<script src="resources/sap-ui-core.js"
 				id="sap-ui-bootstrap"
 				data-sap-ui-libs="sap.m"
 				data-sap-ui-theme="sap_bluecrystal"
 				data-sap-ui-resourceroots='{"views": "./"}'
+				data-sap-ui-appCachebuster="./"
 				>
 		</script>
 		<!-- only load the mobile lib "sap.m" and the "sap_bluecrystal" theme -->
@@ -16,12 +20,24 @@
 		<link rel="stylesheet" href="./assets/styles/main.css">
 
 		<script>
-				var oResource = new sap.ui.model.resource.ResourceModel({bundleUrl: "i18n/i18n.properties", "bundleLocale": "EN"});
-				sap.ui.getCore().setModel(oResource, "i18n");
-				
-				var oModel = new sap.ui.model.json.JSONModel();
+			var oResource = new sap.ui.model.resource.ResourceModel({bundleUrl: "i18n/i18n.properties"}); //, "bundleLocale": "EN"
+			sap.ui.getCore().setModel(oResource, "i18n");
+		
+			var oModel = new sap.ui.model.json.JSONModel();
 
-				sap.ui.getCore().setModel(oModel);
+			
+
+			//Use a storage for cookie data
+			jQuery.sap.require("jquery.sap.storage");
+			oStorage = jQuery.sap.storage(jQuery.sap.storage.Type.local);
+			//Check if there is data into the Storage
+			if (oStorage.get("myLocalData")) {
+				console.log("Data is from Storage!");
+			  	var oData = oStorage.get("myLocalData");
+			  	oModel.setData(oData);
+			}
+
+			sap.ui.getCore().setModel(oModel);
 				
 				sap.ui.localResources("views");
 				var app = new sap.m.App({initialPage:"idApp1"});

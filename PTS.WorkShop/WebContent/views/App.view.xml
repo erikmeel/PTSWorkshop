@@ -16,71 +16,212 @@
 						width="auto" />
 				</contentMiddle>
 				<contentRight>
-					<FlexBox alignContent="Center"
-					justifyContent="Center" wrap="Wrap"
-						renderType="Bare" height="60px" width="100px">
-						<Text class="flexDateTime" id="idDateTime" />
-					</FlexBox>
+					<Label text="{/userinfo/name}" class="userInfo" />
+						
 				</contentRight>
 			</Bar>
 		</customHeader>
 		<content>
-			<IconTabBar>
+			<Dialog id="addEquipmentDialog" title="Create new equipment">
+				<beginButton>
+					<Button text="Create Equipment" />
+				</beginButton>
+				<endButton>
+					<Button text="Cancel" press="onCancelEquipCreate"/>
+				</endButton>
+				<l:Grid hSpacing="1" class="sapUiSmallMarginTop">
+					<l:content>
+						<StandardListItem title="{i18n>CustomerName}">
+							<layoutData>
+								<l:GridData span="L3 M3 S3"/>
+							</layoutData>
+						</StandardListItem>
+						<HBox>
+							<layoutData>
+								<l:GridData span="L4 M4 S4"/>
+							</layoutData>
+							<items>
+								<Input id="idNewCustomerInput" value="{/equipment/installed_at_name}" valueLiveUpdate="true" width="100%"
+									liveChange="customerInputChange" visible="true"/>
+								<ComboBox id="idNewCustomerCombo" toolTip="select customer..." width="100%"
+									visible="false" selectionChange="customerDropDownChange">
+									<items>
+										<c:ListItem text="{vkorg}" tooltip="{spart}" key="{id}"/>
+									</items>
+								</ComboBox>
+							</items>
+						</HBox>
+						<StandardListItem id="idNewCustId" title="ID:">
+							<layoutData>
+								<l:GridData span="L3 M3 S3"/>
+							</layoutData>
+						</StandardListItem>
+						<StandardListItem title="{i18n>SerialNumber}">
+							<layoutData>
+								<l:GridData span="L3 M3 S3"/>
+							</layoutData>
+						</StandardListItem>
+						<Input id="idNewSerialNr" value="{/equipment/serial_number}" valueLiveUpdate="true" width="150px"
+							liveChange="serialChange">
+							<layoutData>
+								<l:GridData span="L9 M9 S9"></l:GridData>
+							</layoutData>
+						</Input>
+						<StandardListItem title="{i18n>Material}">
+							<layoutData>
+								<l:GridData span="L3 M3 S3"/>
+							</layoutData>
+						</StandardListItem>
+						<HBox>
+							<layoutData>
+								<l:GridData span="L3 M3 S3"></l:GridData>
+							</layoutData>
+							<items>
+								<Input id="idNewMaterialNr" value="{/material/id}" valueLiveUpdate="true" maxLength="10" width="150px"
+									liveChange="onMaterialChange" visible="{/entermaterial}">
+								</Input>
+								<ComboBox id="idNewMaterialNrCombo" toolTip="Select material..." items="{/materialList}"
+									showSecondaryValues="true" visible="{/selectmaterial}" selectionChange="onMaterialChange"> 	
+									<items>
+										<c:ListItem text="{id}" additionalText="{description}" key="{id}"/>
+									</items>						
+								</ComboBox>
+							</items>
+						</HBox>
+						<StandardListItem title="{/material/description}" adaptTitleSize="false">
+							<layoutData>
+								<l:GridData span="L5 M5 S5"/>
+							</layoutData>
+						</StandardListItem>
+						<StandardListItem title="{i18n>Description}">
+							<layoutData>
+								<l:GridData span="L3 M3 S3"/>
+							</layoutData>
+						</StandardListItem>
+						<Input id="idNewEquipDescr" value="{/equipment/description}" valueLiveUpdate="true" maxLength="40" width="350px">
+							<layoutData>
+								<l:GridData span="L7 M7 S7"/>
+							</layoutData>
+						</Input>
+					</l:content>
+				</l:Grid>
+			</Dialog>
+			<IconTabBar select="onSelectWorkshopList" expandable="false" expanded="true">
 				<items>
 					<IconTabFilter id="idSearchForm" text="{i18n>EquipmentSearchIconBarText}">
 						<l:Grid hSpacing="1" class="sapUiSmallMarginTop">
 							<l:content>
 								<StandardListItem title="{i18n>SerialNumber}">
 									<layoutData>
-										<l:GridData span="L2 M2 S2"/>
-									</layoutData>
-								</StandardListItem>
-								<Input id="idSerialNr" value="{/equipment/serial_number}" valueLiveUpdate="true" width="150px"
-										liveChange="serialChange">
-									<layoutData>
-										<l:GridData span="L3 M3 S3"></l:GridData>
-									</layoutData>
-								</Input>
-								<StandardListItem title="{i18n>Equipment}">
-									<layoutData>
-										<l:GridData span="L2 M2 S2"/>
-									</layoutData>
-								</StandardListItem>
-								<StandardListItem title="{/equipment/description}">
-									<layoutData>
-										<l:GridData span="L5 M5 S5"/>
-									</layoutData>
-								</StandardListItem>
-								<StandardListItem title="{i18n>CustomerName}">
-									<layoutData>
-										<l:GridData span="L2 M2 S2"/>
+										<l:GridData span="L2 M6 S6"/>
 									</layoutData>
 								</StandardListItem>
 								<HBox>
 									<layoutData>
-										<l:GridData span="L3 M3 S3"></l:GridData>
+										<l:GridData span="L3 M6 S6"></l:GridData>
 									</layoutData>
-									<Input id="idCustomerInput" value="{/equipment/installed_at_name}" valueLiveUpdate="true" width="300px"
-										liveChange="customerInputChange" visible="true"/>
-									<ComboBox id="idCustomerCombo" toolTip="select customer..." 
-											visible="false" selectionChange="customerDropDownChange" width="300px">
-										<items>
-											<c:ListItem text="{name}" tooltip="{city}" key="{id}"/>
-										</items>
-									</ComboBox>	
+									<items>
+										<Input id="idSerialNr" value="{/equipment/serial_number}" valueLiveUpdate="true" width="150px"
+											liveChange="serialChange">
+										</Input>
+										<Button icon="sap-icon://add" press="onAddEquipment" class=" sapThemeHighlight-asBackgroundColor " tooltip="Create new equipment"/>
+									</items>
 								</HBox>
+								
+								<StandardListItem title="{i18n>Equipment}">
+									<layoutData>
+										<l:GridData span="L2 M6 S6"/>
+									</layoutData>
+								</StandardListItem>
+								<StandardListItem title="{/equipment/description}">
+									<layoutData>
+										<l:GridData span="L5 M6 S6"/>
+									</layoutData>
+								</StandardListItem>
+								<StandardListItem title="{i18n>CustomerName}">
+									<layoutData>
+										<l:GridData span="L2 M6 S6"/>
+									</layoutData>
+								</StandardListItem>
+								<HBox>
+									<layoutData>
+										<l:GridData span="L3 M6 S6"/>
+									</layoutData>
+									<items>
+										<Input id="idCustomerInput" value="{/equipment/installed_at_name}" valueLiveUpdate="true"
+											liveChange="customerInputChange" visible="true"/>
+										<ComboBox id="idCustomerCombo" toolTip="select customer..." 
+											visible="false" selectionChange="customerDropDownChange">
+											<items>
+												<c:ListItem text="{vkorg}" tooltip="{spart}" key="{id}"/>
+											</items>
+										</ComboBox>
+									</items>
+								</HBox>	
 								<StandardListItem title="{i18n>CurrentEquipmentState}">
 									<layoutData>
-										<l:GridData span="L2 M2 S2"/>
+										<l:GridData span="L1 M1 S6"/>
 									</layoutData>
 								</StandardListItem>
 								<StandardListItem id="idCurrentState" title="{/equipment/checked_in}">
 									<layoutData>
-										<l:GridData span="L2 M2 S2"/>
+										<l:GridData span="L2 M2 S6"/>
+									</layoutData>
+								</StandardListItem>
+								<StandardListItem title="{i18n>EquipmentWarranty}">
+									<layoutData>
+										<l:GridData span="L2 M2 S6"/>
+									</layoutData>
+								</StandardListItem>
+								<StandardListItem id="idEquipWarr" title="{/equipment/vendor_warranty_end}">
+									<layoutData>
+										<l:GridData span="L2 M2 S6"/>
 									</layoutData>
 								</StandardListItem>
 							</l:content>
 						</l:Grid>
+					</IconTabFilter>
+					<IconTabFilter id="idEquipInWorkshop" text="{i18n&gt;EquipmentCheckedIn}">
+						<FlexBox id="idFlexWorkshop" justifyContent="Center" visible="true">
+							<items>
+								<ScrollContainer id="idWorkshopContainer" width="80%" height="500px" vertical="true">
+									<Table noDataText="No data available"  id="TableEquipmentWorkshop" items="{/equipmentWorkshopList}">
+										<items>
+											<ColumnListItem>
+												<cells>
+													<Link text="{serial_number}" press="selectSerialNr"/>
+													<Text text="{description}" />
+													<Text text="{customerName}" />
+													<Text text="{status}" />
+												</cells>
+											</ColumnListItem>
+										</items>
+										<columns>
+											<Column width="20%">
+												<header>
+													<Text text="{i18n>SerialNumber}"/>
+												</header>
+											</Column>					
+											<Column width="35%">
+												<header>
+												<Text text="{i18n>Description}"/>
+											</header>
+											</Column>
+											<Column width="35%">
+												<header>
+												<Text text="{i18n>CustomerName}"/>
+											</header>
+											</Column>
+											<Column width="10%">
+												<header>
+												<Text text="{i18n>CurrentEquipmentState}"/>
+											</header>
+											</Column>
+										</columns>
+									</Table>
+								</ScrollContainer>
+							</items>
+						</FlexBox>
 					</IconTabFilter>
 				</items>
 			</IconTabBar>
@@ -89,27 +230,51 @@
 					<IconTabFilter id="idServiceFlow" text="Service Flow" visible="{/equipmentfound}">
 						<l:Grid defaultSpan="L6 M6 S12">
 							<l:content>
-								<TextArea id="idNotifText" rows="10" width="100%" 
-									value="Damage:&#13;&#13;Driver:&#13;License Plate:&#13;LOT:">
+								<StandardListItem title="Arrival date/time:">
 									<layoutData>
-										<l:GridData span="L5 M5 S10"/>
+										<l:GridData span="L2 M6 S6"/>
+									</layoutData>
+								</StandardListItem>
+								<DateTimePicker
+									id="dtpArrivalDateTime"	displayFormat="yyyy-MM-dd HH:mm" 
+									valueFormat="yyyy-MM-dd HH:mm"
+									placeholder="Select arrival date and time...">
+									<layoutData>
+										<l:GridData span="L5 M6 S6"/>
+									</layoutData>
+								</DateTimePicker>
+								<TextArea id="idNotifText" rows="10" width="100%" 
+									value="Damage:&#13;&#13;Transport Company:&#13;Driver:&#13;License Plate:&#13;LOT:">
+									<layoutData>
+										<l:GridData span="L6 M8 S12"/>
 									</layoutData>
 								</TextArea>
-								<l:Grid defaultSpan="L7 M7 S6">
+								<l:Grid defaultSpan="L7 M6 S6">
 									<l:content>
 										<Button id="idBtnCheckin" type="Emphasized" text="{/checkinButton}" press="checkInEquipment" >
 											<layoutData>
-												<l:GridData span="L3 M3 S8"/>
+												<l:GridData span="L3 M12 S12"/>
 											</layoutData>
 										</Button>
-										<Label text="Fixed Price:" labelFor="idCmbFlow">
+										
+										<StandardListItem title="Fixed Price:">
 											<layoutData>
-												<l:GridData span="L3 M3 S10"/>
+												<l:GridData span="L3 M6 S6"/>
 											</layoutData>
-										</Label>
+										</StandardListItem>
 										<Input id="idFixedPriceValue" placeholder="Price" tooltip="Enter price for order" description="LCU" enabled="false" liveChange="inputFPPriceChange">
 											<layoutData>
-												<l:GridData span="L4 M4 S4"/>
+												<l:GridData span="L4 M6 S6"/>
+											</layoutData>
+										</Input>
+										<StandardListItem title="Send info to:">
+											<layoutData>
+												<l:GridData span="L3 M6 S6"/>
+											</layoutData>
+										</StandardListItem>
+										<Input id="idSendMailTo" placeholder="e-mail" value="{/mailto}" tooltip="Send e-mail to user to inform about order creation and check-in" liveChange="inputMailChange">
+											<layoutData>
+												<l:GridData span="L4 M6 S6"/>
 											</layoutData>
 										</Input>
 									</l:content>
@@ -119,6 +284,9 @@
 					</IconTabFilter>
 					<IconTabFilter id="idEquipmentList" text="{i18n>EquipmentOnLocation}">
 						<FlexBox id="idFlexEquipment" justifyContent="Center" visible="false">
+							<layoutData>
+								<l:GridData span="L6 M12 S12"/>
+							</layoutData>
 							<items>
 								<ScrollContainer id="idSelectContainer" width="80%" height="500px" vertical="true">
 									<Table id="TableEquipment" items="{/equipmentList}">
@@ -150,7 +318,7 @@
 					<IconTabFilter id="idOrderList" text="Orders" visible="false">
 						<f:SimpleForm title="{i18n>serviceDetailPanelText}">
 							<f:content>
-								<Table noDataText="er is niks" id="TableOrders" items="{/Orders}">
+								<Table noDataText="No data available" id="TableOrders" items="{/Orders}">
 									<items>
 										<ColumnListItem counter="0">
 											<cells>
