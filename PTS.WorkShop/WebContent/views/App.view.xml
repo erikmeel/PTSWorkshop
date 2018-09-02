@@ -24,7 +24,7 @@
 		<content>
 			<Dialog id="addEquipmentDialog" title="Create new equipment">
 				<beginButton>
-					<Button text="Create Equipment" />
+					<Button text="Create Equipment" press="onCreateEquipment" />
 				</beginButton>
 				<endButton>
 					<Button text="Cancel" press="onCancelEquipCreate"/>
@@ -41,12 +41,12 @@
 								<l:GridData span="L4 M4 S4"/>
 							</layoutData>
 							<items>
-								<Input id="idNewCustomerInput" value="{/equipment/installed_at_name}" valueLiveUpdate="true" width="100%"
-									liveChange="customerInputChange" visible="true"/>
+								<Input id="idNewCustomerInput" value="{/installed_at_new}" valueLiveUpdate="true" width="100%"
+									liveChange="onNewCustomerInputChange" visible="true"/>
 								<ComboBox id="idNewCustomerCombo" toolTip="select customer..." width="100%"
-									visible="false" selectionChange="customerDropDownChange">
+									visible="false" selectionChange="onNewCustomerInputChange" items="{/new_customers}">
 									<items>
-										<c:ListItem text="{vkorg}" tooltip="{spart}" key="{id}"/>
+										<c:ListItem text="{name}" tooltip="{city}" key="{id}"/>
 									</items>
 								</ComboBox>
 							</items>
@@ -61,8 +61,8 @@
 								<l:GridData span="L3 M3 S3"/>
 							</layoutData>
 						</StandardListItem>
-						<Input id="idNewSerialNr" value="{/equipment/serial_number}" valueLiveUpdate="true" width="150px"
-							liveChange="serialChange">
+						<Input id="idNewSerialNr" value="{/serial_number_new}" valueLiveUpdate="true" width="150px"
+							liveChange="onNewSerialChange">
 							<layoutData>
 								<l:GridData span="L9 M9 S9"></l:GridData>
 							</layoutData>
@@ -77,7 +77,7 @@
 								<l:GridData span="L3 M3 S3"></l:GridData>
 							</layoutData>
 							<items>
-								<Input id="idNewMaterialNr" value="{/material/id}" valueLiveUpdate="true" maxLength="10" width="150px"
+								<Input id="idNewMaterialNr" value="{/newmaterial}" valueLiveUpdate="true" maxLength="10" width="150px"
 									liveChange="onMaterialChange" visible="{/entermaterial}">
 								</Input>
 								<ComboBox id="idNewMaterialNrCombo" toolTip="Select material..." items="{/materialList}"
@@ -98,7 +98,7 @@
 								<l:GridData span="L3 M3 S3"/>
 							</layoutData>
 						</StandardListItem>
-						<Input id="idNewEquipDescr" value="{/equipment/description}" valueLiveUpdate="true" maxLength="40" width="350px">
+						<Input id="idNewEquipDescr" value="{/newdescription}" valueLiveUpdate="true" liveChange="onDescriptionChange" maxLength="40" width="350px">
 							<layoutData>
 								<l:GridData span="L7 M7 S7"/>
 							</layoutData>

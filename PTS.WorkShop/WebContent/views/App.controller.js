@@ -34,6 +34,7 @@ sap.ui.controller("views.App", {
 		oModel.setProperty("/selectmaterial",false);
 		oModel.setProperty("/entermaterial",true);
 		oModel.setProperty("/material", initialMaterial);
+		oModel.setProperty("/new_customers", null);
 		
 		//Add an AfterRendering on Comboboxes to set default values
 		var cmbNewMaterialNr = this.byId("idNewMaterialNrCombo");
@@ -300,10 +301,9 @@ sap.ui.controller("views.App", {
 		aEquipment.push(equipment);
 		oModel.setProperty("/equipment", aEquipment[0]);
 		
-		
 		if(this.isNumeric(custn)) {
 			//if it is a number, then read using customer number
-			
+			// NOT IMPLEMENTED
 		} else {
 			//GET_BY_ADDRESS_C4S
 			var aAccountGrps = [];
@@ -355,6 +355,83 @@ sap.ui.controller("views.App", {
 		//Use variable newEquipPopup to decide if list needs to be shown in pop-up or not
 		this.fillCustomerCombo(newEquipPopup);
 		
+	},
+	
+	onNewCustomerInputChange: function(oEvent) {
+		var custn = oEvent.mParameters.value;
+		var customerInput = this.byId("idNewCustomerInput");
+		var customerCombo = this.byId("idNewCustomerCombo");
+		var custID = this.byId("idNewCustId");
+		
+		customerInput.setValueState("None");
+		customerCombo.setValueState("None");
+		
+		if(custn) {  //this means we are using the input box, otherwise we use Combo
+			var userinfo = oModel.getProperty("/userinfo");
+			var salesorg = userinfo.default_sales_org;
+			var division = userinfo.default_division;
+			var customersFound = 0;
+			var aAccountGrps = [];
+			aAccountGrps.push("Z002");  //Read only Installed-At and Ship-to customers
+		
+			if(custn.length >= 4) {		//Start searching if user enter 4 or more characters
+				var j = {
+					'name': custn,
+					'country': salesorg.substring(0,2),
+					'sales_org': salesorg,
+					'distr_chn': '01',
+					'division': division,
+					'account_grps':  aAccountGrps
+				}
+			
+				var locationHostName = window.location.hostname;
+				var strUrl;
+				if(locationHostName.toLowerCase()=="localhost") {
+					// AS1 "proxy/http/as1sapr3.emea.group.atlascopco.com:8060/sap/zrest/stc/customer?sap-client=500&sap-language=EN";
+					// AD1 "proxy/http/ad1sapr3.emea.group.atlascopco.com:8076/sap/zrest/stc/customer?sap-client=510&sap-language=EN";
+					strUrl = "proxy/http/ad1sapr3.emea.group.atlascopco.com:8076/sap/zrest/stc/customer?sap-client=510&sap-language=EN";
+				} else {
+					strUrl = "/sap/zrest/stc/customer?sap-client=500&sap-language=EN";
+				}
+			
+				//Call Backend system to request customers with parameters as specified in JSON structure
+				var aData = jQuery.ajax({
+					type: "GET",
+					contentType: "application/json", 
+			    	url: strUrl,
+					data: {"json": JSON.stringify(j), "action": "get_by_address"},
+			    	dataType: "json", 
+			    	success: function(data, textStatus, jqXHR){ 
+				
+						var result = data[0].model;
+						if (result.length > 0) {
+							oModel.setProperty("/new_customers", result);
+							customersFound = result.length;
+							customerInput.setVisible(false);
+							customerCombo.setVisible(true);
+							customerCombo.setSelectedKey(result[0].id);
+							custID.setTitle("ID: "+result[0].id);
+						} else {
+							oModel.setProperty("/new_customers", null);
+							customerInput.setVisible(true);
+							customerCombo.setVisible(false);
+						};
+					},  
+					error: function(json) {  
+						customerInput.setVisible(true);
+						customerCombo.setVisible(false);
+					}
+				});
+			}
+		} else {  //Now we follow-up changes of Combo
+			if(customerCombo.mProperties.selectedKey==="") {
+				customerCombo.setVisible(false);
+				customerInput.setVisible(true);
+				custID.setTitle("ID: ");
+			} else {
+				custID.setTitle("ID"+customerCombo.mProperties.selectedKey);
+			}
+		}
 	},
 	
 	customerDropDownChange: function(t) {
@@ -933,6 +1010,60 @@ sap.ui.controller("views.App", {
 		oDialog.open();
 	},
 	
+	onNewSerialChange: function(oEvent) {
+		var sernr = this.byId("idNewSerialNr");
+		var val = oEvent.mParameters.value;
+		sernr.setValueState("None");
+		
+		val=val.toUpperCase();
+		
+		oModel.setProperty("/serial_number_new", val);
+		
+	},
+
+	onCreateEquipment: function(oEvent) {
+		var newCustCombo = this.byId("idNewCustomerCombo");
+		var newCustInput = this.byId("idNewCustomerInput");
+		var newSerialNr = this.byId("idNewSerialNr");
+		var newMaterialNr = this.byId("idNewMaterialNr");
+		var newDescription = this.byId("idNewEquipDescr");
+		var validation = true;
+		
+		if(newCustCombo.mProperties.selectedKey == null || newCustCombo.mProperties.selectedKey == "") {
+			newCustCombo.setValueState("Error");
+			newCustInput.setValueState("Error");
+			validation = false;
+		} else {
+			newCustCombo.setValueState("None");
+		}
+		
+		if(newSerialNr.mProperties.value=="") {
+			newSerialNr.setValueState("Error");
+			validation = false;
+		} else {
+			newSerialNr.setValueState("None");
+		}
+		
+		if(newMaterialNr.mProperties.value == "" || newMaterialNr.mProperties.length < 10) {
+			newMaterialNr.setValueState("Error");
+			validation = false;
+		} else {
+			newMaterialNr.setValueState("None");
+		}
+		
+		if(newDescription.mProperties.value == "") {
+			newDescription.setValueState("Error");
+			validation = false;
+		} else {
+			newDescription.setValueState("None");
+		}
+		
+		if(validation) {
+			alert('equipment will be created');
+		}
+		
+	},
+	
 	onCancelEquipCreate: function(oEvent) {
 		var oView = this.getView();
 		var oDialog = oView.byId("addEquipmentDialog");
@@ -942,8 +1073,27 @@ sap.ui.controller("views.App", {
 		}
 	},
 	
+	onDescriptionChange: function(oEvent) {
+		var idDescription = this.byId("idNewEquipDescr");
+		var val = oEvent.mParameters.value;
+		idDescription.setValueState("None");
+		
+		//val=val.toUpperCase();
+		
+		oModel.setProperty("/newdescription", val);
+		
+	},
+	
 	onMaterialChange: function(oEvent) {
-		var locationHostName = window.location.hostname;
+		var idMaterial = this.byId("idNewMaterialNr");
+		var val = oEvent.mParameters.value;
+		idMaterial.setValueState("None");
+		
+		val = val.toUpperCase();
+		
+		oModel.setProperty("/newmaterial", val);
+		
+	/*	var locationHostName = window.location.hostname;
 		
     	var materialnr = null;
     	var idInputMaterial = this.byId("idNewMaterialNr");
@@ -1005,6 +1155,7 @@ sap.ui.controller("views.App", {
 				success: this.onRequestMaterialSuccess,
 				error: function(json) {   } });
 		}
+		*/
 	},
 	
 	onSelectWorkshopList: function(oEvent) {
