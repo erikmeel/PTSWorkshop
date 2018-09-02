@@ -106,7 +106,7 @@
 					</l:content>
 				</l:Grid>
 			</Dialog>
-			<IconTabBar select="onSelectWorkshopList" expandable="false" expanded="true">
+			<IconTabBar id="idMainIconBar" select="onSelectWorkshopList" expandable="false" expanded="true">
 				<items>
 					<IconTabFilter id="idSearchForm" text="{i18n>EquipmentSearchIconBarText}">
 						<l:Grid hSpacing="1" class="sapUiSmallMarginTop">
@@ -189,30 +189,30 @@
 										<items>
 											<ColumnListItem>
 												<cells>
-													<Link text="{serial_number}" press="selectSerialNr"/>
+													<Link text="{serial_number}" id="idWorkListSerialNr" press="selectSerialNr"/>
 													<Text text="{description}" />
-													<Text text="{customerName}" />
+													<Text text="{installed_at_name}" />
 													<Text text="{status}" />
 												</cells>
 											</ColumnListItem>
 										</items>
 										<columns>
-											<Column width="20%">
+											<Column width="2em">
 												<header>
 													<Text text="{i18n>SerialNumber}"/>
 												</header>
 											</Column>					
-											<Column width="35%">
+											<Column width="4em">
 												<header>
 												<Text text="{i18n>Description}"/>
 											</header>
 											</Column>
-											<Column width="35%">
+											<Column width="5em">
 												<header>
 												<Text text="{i18n>CustomerName}"/>
 											</header>
 											</Column>
-											<Column width="10%">
+											<Column width="2em">
 												<header>
 												<Text text="{i18n>CurrentEquipmentState}"/>
 											</header>

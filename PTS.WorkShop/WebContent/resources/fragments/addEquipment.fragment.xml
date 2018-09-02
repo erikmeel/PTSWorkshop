@@ -1,0 +1,63 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+	xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form">
+	<Dialog id="addEquipmentDialog" title="Create new equipment">
+		<beginButton>
+			<Button text="Create Equipment" />
+		</beginButton>
+		<endButton>
+			<Button text="Cancel" press="onCancelEquipCreate"/>
+		</endButton>
+		<l:Grid hSpacing="1" class="sapUiSmallMarginTop">
+			<l:content>
+				<StandardListItem title="{i18n>SerialNumber}">
+					<layoutData>
+						<l:GridData span="L3 M3 S3"/>
+					</layoutData>
+				</StandardListItem>
+				<Input id="idNewSerialNr" value="{/equipment/serial_number}" valueLiveUpdate="true" width="150px">
+					<layoutData>
+						<l:GridData span="L5 M5 S5"></l:GridData>
+					</layoutData>
+				</Input>
+				<ComboBox id="idSelectCategory" toolTip="Select category ...">
+					<layoutData>
+						<l:GridData span="L4 M4 S4"></l:GridData>
+					</layoutData>
+					<items>
+						<core:ListItem text="Power Technique Service" key="PT"/>
+						<core:ListItem text="Compressor Technique" key="CT"/>
+					</items>
+				</ComboBox>
+				<StandardListItem title="{i18n>Material}">
+					<layoutData>
+						<l:GridData span="L3 M3 S3"/>
+					</layoutData>
+				</StandardListItem>
+				<StandardListItem title="{/material/description}">
+					<layoutData>
+						<l:GridData span="L9 M9 S9"/>
+					</layoutData>
+				</StandardListItem>
+				<StandardListItem title="{i18n>Description}">
+					<layoutData>
+						<l:GridData span="L3 M3 S3"/>
+					</layoutData>
+				</StandardListItem>
+				<StandardListItem title="{/equipment/description}">
+					<layoutData>
+						<l:GridData span="L9 M9 S9"/>
+					</layoutData>
+				</StandardListItem>
+				<StandardListItem title="{i18n>CustomerName}">
+					<layoutData>
+						<l:GridData span="L3 M3 S3"/>
+					</layoutData>
+				</StandardListItem>
+			</l:content>
+		</l:Grid>
+	</Dialog>
+</core:FragmentDefinition>

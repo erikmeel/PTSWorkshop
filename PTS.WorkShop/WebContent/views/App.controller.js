@@ -222,17 +222,26 @@ sap.ui.controller("views.App", {
 								checkInButton.setEnabled(false);
 								inputPrice.setEnabled(true);
 								eqState.addStyleClass("InfoStateRed");
-							} else if(result[0].user_status && result[0].user_status.indexOf("ZCHO")!==-1) {
+							}
+							if(result[0].user_status && result[0].user_status.indexOf("ZINS")!==-1) {
+								oModel.setProperty("/equipment/checked_in","In Service");
+								oModel.setProperty("/checkinButton", "Ready for Shipment");
+								checkInButton.setEnabled(true);
+								inputPrice.setEnabled(false);
+								eqState.addStyleClass("InfoStateGreen");
+							}
+							if(result[0].user_status && result[0].user_status.indexOf("ZCHO")!==-1) {
 								oModel.setProperty("/equipment/checked_in","Checked-Out");
 								oModel.setProperty("/checkinButton", "Check in");
 								eqState.addStyleClass("InfoStateGreen");
 								arrDateTime.setEnabled(true);
-							} else if(result[0].user_status && result[0].user_status.indexOf("ZRFS")!==-1) {
+							}
+							if(result[0].user_status && result[0].user_status.indexOf("ZRFS")!==-1) {
 								oModel.setProperty("/equipment/checked_in","Ready for Shipment");
 								oModel.setProperty("/checkinButton", "Check out");
 								eqState.addStyleClass("InfoStateGreen");
 							}
-							else {
+							if (result[0].user_status && result[0].user_status === "") {
 								oModel.setProperty("/equipment/checked_in","Unknown");
 								oModel.setProperty("/checkinButton", "Check in");
 								arrDateTime.setEnabled(true);
@@ -434,6 +443,7 @@ sap.ui.controller("views.App", {
 			type: "GET",
 		    contentType: "application/json", 
 		    url: strUrl,
+			data: {"action": "get_hr_info"},
 		    dataType: "json", 
 			success: this.onRequestUserInfoSuccess,
 			error: function(json) {   } });
@@ -606,6 +616,9 @@ sap.ui.controller("views.App", {
     },
     
     selectSerialNr: function(t) {
+    	var mainIconBar = this.byId("idMainIconBar");
+    	var equipSearchForm = this.byId("idSearchForm");
+    	
     	var sernr = this.byId("idSerialNr");
     	if(t.oSource.mProperties["text"]) {
     		var sn = t.oSource.mProperties["text"];
@@ -613,8 +626,14 @@ sap.ui.controller("views.App", {
     		
     		sernr.setValue(sn);
     		
-    		this.serialChange(t);
+    	//	this.serialChange(t);
     	}
+    	
+    	//Switch view IconBar
+    	var id = t.mParameters.id;
+    	if(id.indexOf('idWorkListSerialNr') != -1) {
+    		mainIconBar.setSelectedKey(equipSearchForm.id);
+    	} 
     },
     
     checkInEquipment: function(t) {
@@ -622,6 +641,7 @@ sap.ui.controller("views.App", {
     	var btnCheckin = this.byId("idBtnCheckin");
     	var arrDateTime = this.byId("dtpArrivalDateTime");
     	var notifText = this.byId("idNotifText");
+    	var eqStateLabel = this.byId("idCurrentState");
     	var postdata = null;
     	var userStatuses = [];
     	var text = "";
@@ -640,7 +660,7 @@ sap.ui.controller("views.App", {
     			var service_order_par = [];
     			var service_order_nts = [];
     			if(arrDateTime.mProperties.value)
-    				text = "Arrival date/time: " + arrDateTime.mProperties.value;
+    				text = "Arrival date/time: " + arrDateTime.mProperties.value + "\r";
     			
     			if(notifText.mProperties.value)
     				text += notifText.mProperties.value;
@@ -726,6 +746,7 @@ sap.ui.controller("views.App", {
     		}
     		userStatuses.push({'USER_STATUS_CODE':'ZCHI','INACT': ''});
     		userStatuses.push({'USER_STATUS_CODE':'ZCHO','INACT': 'X'});
+    		userStatuses.push({'USER_STATUS_CODE':'ZRFS','INACT': 'X'});
     		postdata = {
     				'equnr': equipment.id,
     				'user_status_changes': userStatuses
@@ -736,11 +757,20 @@ sap.ui.controller("views.App", {
     	if(eqState=="Checked-In") {
     		oModel.setProperty("/equipment/checked_in","In Service");
     		oModel.setProperty("/checkinButton", "Ready for Shipment");
+    		
+    		userStatuses.push({'USER_STATUS_CODE':'ZINS','INACT': ''});
+    		userStatuses.push({'USER_STATUS_CODE':'ZRFS','INACT': 'X'});
+    		userStatuses.push({'USER_STATUS_CODE':'ZCHO','INACT': 'X'});
+    		postdata = {
+    				'equnr': equipment.id,
+    				'user_status_changes': userStatuses
+    		};
     	}
     	if(eqState=="In Service") {
     		oModel.setProperty("/equipment/checked_in","Ready for Shipment");
     		oModel.setProperty("/checkinButton", "Check out");
     		
+    		userStatuses.push({'USER_STATUS_CODE':'ZINS','INACT': 'X'});
     		userStatuses.push({'USER_STATUS_CODE':'ZRFS','INACT': ''});
     		userStatuses.push({'USER_STATUS_CODE':'ZCHO','INACT': 'X'});
     		postdata = {
@@ -754,6 +784,7 @@ sap.ui.controller("views.App", {
     		arrDateTime.setEnabled(true);
     		
     		userStatuses.push({'USER_STATUS_CODE':'ZCHO','INACT': ''});
+    		userStatuses.push({'USER_STATUS_CODE':'ZINS','INACT': 'X'});
     		userStatuses.push({'USER_STATUS_CODE':'ZCHI','INACT': 'X'});
     		userStatuses.push({'USER_STATUS_CODE':'ZRFS','INACT': 'X'});
     		postdata = {
@@ -784,22 +815,30 @@ sap.ui.controller("views.App", {
 					if(result[0].user_status && result[0].user_status.indexOf("ZCHI")!==-1) {
 						oModel.setProperty("/equipment/checked_in","Checked-In");
 						oModel.setProperty("/checkinButton", "Start Service Repair");
-						eqState.addStyleClass("InfoStateRed");
-					} else if(result[0].user_status && result[0].user_status.indexOf("ZCHO")!==-1) {
+						eqStateLabel.addStyleClass("InfoStateRed");
+					} 
+					if(result[0].user_status && result[0].user_status.indexOf("ZINS")!==-1) {
+						oModel.setProperty("/equipment/checked_in","In Service");
+						oModel.setProperty("/checkinButton", "Ready for Shipment");
+						eqStateLabel.addStyleClass("InfoStateGreen");
+						arrDateTime.setEnabled(false);
+					}
+					if(result[0].user_status && result[0].user_status.indexOf("ZCHO")!==-1) {
 						oModel.setProperty("/equipment/checked_in","Checked-Out");
 						oModel.setProperty("/checkinButton", "Check in");
-						eqState.addStyleClass("InfoStateGreen");
+						eqStateLabel.addStyleClass("InfoStateGreen");
 						arrDateTime.setEnabled(true);
-					} else if(result[0].user_status && result[0].user_status.indexOf("ZRFS")!==-1) {
+					}
+					if(result[0].user_status && result[0].user_status.indexOf("ZRFS")!==-1) {
 						oModel.setProperty("/equipment/checked_in","Ready for Shipment");
 						oModel.setProperty("/checkinButton", "Check out");
-						eqState.addStyleClass("InfoStateGreen");
+						eqStateLabel.addStyleClass("InfoStateGreen");
 					}
-					else {
+					if(result[0].user_status && result[0].user_status === "") {
 						oModel.setProperty("/equipment/checked_in","Unknown");
 						oModel.setProperty("/checkinButton", "Check in");
 						arrDateTime.setEnabled(true);
-						eqState.addStyleClass("InfoStateGreen");
+						eqStateLabel.addStyleClass("InfoStateGreen");
 					}
 				 },
 				error: function() {}
@@ -933,6 +972,8 @@ sap.ui.controller("views.App", {
 				{'SELNAME': 'MATNR', 'KIND':'S', 'SIGN':'I', 'OPTION': 'EQ', 'LOW': materialnr}]
 		}
 		
+		var materialIds = [];
+		
 		if(materialnr.length>=4) {
 		
 			if(locationHostName.toLowerCase()=="localhost") {
@@ -942,12 +983,24 @@ sap.ui.controller("views.App", {
 			} else {
 				strUrl = "/sap/zrest/stc/material?sap-client=500&sap-language=EN";
 			}
+			
+			if(materialnr.length < 10) {
+				materialnr = materialnr + '*';
+			}
+			var materialId = {
+					'matnr': materialnr
+			} 
+			materialIds.push(materialnr);
+			
+			j = {
+					'IDS': materialIds
+			}
     	
 			var aData = jQuery.ajax({
 				type: "GET",
 				    contentType: "application/json", 
 		    	url: strUrl,
-				data: {"json": JSON.stringify(j), "action": "query_material"},
+				data: {"json": JSON.stringify(j), "action": "get_all_in_range"},
 		    	dataType: "json", 
 				success: this.onRequestMaterialSuccess,
 				error: function(json) {   } });
@@ -962,7 +1015,8 @@ sap.ui.controller("views.App", {
 
 			var j = { 'rsparms_tt':
 						[{'SELNAME': 'EQART', 'KIND':'S', 'SIGN':'I', 'OPTION': 'EQ', 'LOW': 'EQUIPMENT'},
-							{'SELNAME': 'STAT', 'KIND':'S', 'SIGN':'I', 'OPTION': 'EQ', 'LOW': 'ZCHIN'},
+							{'SELNAME': 'STAT', 'KIND':'S', 'SIGN':'I', 'OPTION': 'EQ', 'LOW': 'ZCHI'},
+							{'SELNAME': 'STAT', 'KIND':'S', 'SIGN':'I', 'OPTION': 'EQ', 'LOW': 'ZINS'},
 							{'SELNAME': 'STAT', 'KIND':'S', 'SIGN':'I', 'OPTION': 'EQ', 'LOW': 'ZRFS'},
 							{'SELNAME': 'VKORG', 'KIND':'S', 'SIGN':'I', 'OPTION': 'EQ', 'LOW': vkorg}]
 			}
@@ -988,22 +1042,25 @@ sap.ui.controller("views.App", {
 						var result = data[0].model;
 						//Test if data has been found
 						if (result.length > 0) {
-								
-								//If the result contains 1 data set, then 1 equipment is found and can be displayed
-								if(result.length === 1) {
-									aEquipment = [];
-									
-									aEquipment.push(result[0]);
-									
-									oModel.setProperty("/equipmentWorkshopList", aEquipment[0]);
-									
-								} 
-							
-							//If no data is found, reset content of other fields, areas...	
-							} else {
-								oModel.setProperty("/equipmentWorkshopList", null);
-							} 
-						},  
+							aEquipment = [];		
+							for(var i = 0; i < result.length;i++) {
+								if(result[i].user_status.indexOf("ZCHI")!==-1) {
+									result[i].status = "Checked-In";
+								}
+								if(result[i].user_status.indexOf("ZINS")!==-1) {
+									result[i].status = "In Service";
+								}
+								if(result[i].user_status.indexOf("ZRFS")!==-1) {
+									result[i].status = "Ready for Shipment";
+								}
+								aEquipment.push(result[i]);
+							}
+						}
+						else {
+							aEquipment = [];
+						}
+						oModel.setProperty("/equipmentWorkshopList", aEquipment);
+					},  
 						error: function(json) {  alert("fail to post"); } });
 		}
 		
